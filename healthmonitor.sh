@@ -1,29 +1,13 @@
 #!/bin/bash
-# ==========================================
-# System Health Monitoring Script
-# Author: Your Name
-# Date: 2025-09-14
-# Description:
-#   This script checks:
-#     - Disk usage
-#     - Memory usage
-#     - CPU load
-#     - Status of important services (e.g., sshd)
-#   Results are logged into system_health.log with timestamps.
-# ==========================================
-
 # Log file where results will be saved
 LOGFILE="system_health.log"
 
 # Current timestamp (date + time)
 TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
+# check_disk- Check root (/) partition disk usage
 
-# -------------------------------
-# Function: check_disk
-# Purpose: Check root (/) partition disk usage
-# -------------------------------
 check_disk() {
-    # Get the usage percentage of root filesystem (e.g., 75)
+    # Get the usage percentage of root filesystem 
     USAGE=$(df -h / | awk 'NR==2 {print $5}' | sed 's/%//')
 
     # If usage > 80% → log a warning, otherwise log OK
@@ -33,11 +17,8 @@ check_disk() {
         echo "[$TIMESTAMP] Disk Usage: $USAGE% (OK)" | tee -a $LOGFILE
     fi
 }
+# check memory
 
-# -------------------------------
-# Function: check_memory
-# Purpose: Check memory (RAM) usage
-# -------------------------------
 check_memory() {
     # free → shows memory usage
     # awk → calculates used/total * 100 and rounds to whole number
@@ -51,10 +32,7 @@ check_memory() {
     fi
 }
 
-# -------------------------------
-# Function: check_cpu
-# Purpose: Check CPU load (1-minute average)
-# -------------------------------
+# check cpu load 1 min avg
 check_cpu() {
     # uptime → shows system load averages
     # awk → extracts the load average numbers
@@ -62,7 +40,7 @@ check_cpu() {
     # xargs → trims spaces
     LOAD=$(uptime | awk -F'load average:' '{ print $2 }' | cut -d, -f1 | xargs)
 
-    # Strip decimal part to compare as integer (e.g., 2.35 → 2)
+    # Strip decimal part to compare as integer 
     LOAD_INT=${LOAD%.*}
 
     # If CPU load > 2 → warning, else OK
@@ -73,10 +51,9 @@ check_cpu() {
     fi
 }
 
-# -------------------------------
-# Function: check_service
-# Purpose: Check if a system service is running
-# -------------------------------
+
+# Check if a system service is running
+
 check_service() {
     # $1 → first argument passed to the function (service name)
     SERVICE=$1
@@ -89,12 +66,8 @@ check_service() {
     fi
 }
 
-# -------------------------------
-# Main script execution
-# -------------------------------
 
-# Run all checks one by one
-check_disk          # Check disk space
-check_memory        # Check RAM usage
-check_cpu           # Check CPU load
-check_service sshd  # Check SSH service (important for EC2 access)
+check_disk          
+check_memory        
+check_cpu           
+check_service sshd  
